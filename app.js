@@ -9,15 +9,16 @@ const Schema = mongoose.Schema;
 const articleSchema = new Schema({
   title: String,
   author: String,
-  body: String,
-  createTime: {
-    type: Date,
-    default: Date.now
-  },
+  content: String,
   hidden: Boolean,
   meta: {
     votes: Number,
     favs: Number
+  }
+}, {
+  timestamps: {
+    createdAt: 'created',
+    updatedAt: 'updated'
   }
 });
 
@@ -40,7 +41,7 @@ app.listen(3001, () => {
 app.use(async ctx => {
   if (ctx.request.path === '/api/article/all') {
     console.log('53')
-    const Article = mongoose.model('article1', articleSchema);
+    const Article = mongoose.model('article', articleSchema);
     //const article1 = new Article({
     //      title: 'hhhhh'
     //   });
@@ -48,11 +49,41 @@ app.use(async ctx => {
     //          console.log('article:34', article);
 
     //})
-    ctx.body = await Article.find((err, article) => {
+    const data = await Article.find((err, article) => {
       console.log('article:35', article);
       return article;
     });
+    ctx.body = {
+      code: 200,
+      data,
+      message: null
+    }
   };
+  if (ctx.request.path === '/api/article/create') {
+    console.log('53')
+    const Article = mongoose.model('article', articleSchema);
+    //const article1 = new Article({
+    //      title: 'hhhhh'
+    //   });
+    //article1.save((err, article) => {
+    //          console.log('article:34', article);
+
+    //})
+    const article = new Article({
+      title: '接口创建的'
+    });
+    article.save();
+    const data = await Article.find((err, article) => {
+      console.log('article:35', article);
+      return article;
+    });
+    ctx.body = {
+      code: 200,
+      data,
+      message: null
+    }
+
+  }
 
   //    const article = await getArticle();
   //    console.log('article,', article);

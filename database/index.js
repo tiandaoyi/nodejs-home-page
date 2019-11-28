@@ -15,5 +15,5 @@ mongoose.connect(DB_ADDRESS, {
   }
 
 });
-
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 module.exports = mongoose;
