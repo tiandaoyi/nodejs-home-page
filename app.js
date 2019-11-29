@@ -11,6 +11,8 @@ const articleSchema = new Schema({
   author: String,
   content: String,
   hidden: Boolean,
+  tag: Array,
+  hot: Number,
   meta: {
     votes: Number,
     favs: Number
