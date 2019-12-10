@@ -24,16 +24,6 @@ const articleSchema = new Schema({
   }
 });
 
-//const articleOne = new Article({
-//  title: '大数据是什么'
-//});
-//console.log('27', articleOne);
-
-// Article.),
-//mongoose.connection.on('open', (res) => {
-//  console.log('28', res);
-//  // 查找数据
-//});
 // 启动服务
 // 监听3001端口
 app.listen(3001, () => {
@@ -41,18 +31,10 @@ app.listen(3001, () => {
 });
 
 app.use(async ctx => {
+  // 文章model
+  const Article = mongoose.model('article', articleSchema);
   if (ctx.request.path === '/api/article/all') {
-    console.log('53')
-    const Article = mongoose.model('article', articleSchema);
-    //const article1 = new Article({
-    //      title: 'hhhhh'
-    //   });
-    //article1.save((err, article) => {
-    //          console.log('article:34', article);
-
-    //})
     const data = await Article.find((err, article) => {
-      console.log('article:35', article);
       return article;
     });
     ctx.body = {
@@ -60,53 +42,78 @@ app.use(async ctx => {
       data,
       message: null
     }
+    return;
   };
+
   if (ctx.request.path === '/api/article/create') {
-    const Article = mongoose.model('article', articleSchema);
     const obj = await parsePostData(ctx);
     const {
       title,
       content
     } = JSON.parse(obj);
-console.log('71', obj);
-//for(let o of obj) {
-//console.log('73');
-//console.log(o);
-//}
-console.log('76', JSON.parse(obj)['title']);
-    console.log('content', content);
     const article = new Article({
       title,
       content
     });
-    const data = await article.save((err, article, numAffected) => {
-      console.log('83', err);
-      console.log('84', article);
-      console.log('85', numAffected);
-      return article;
-    });
-    console.log('87', data);
+    console.log('58')
+    let repErr = null;
+    await article.save();
     ctx.body = {
       code: 200,
-      data,
-      message: null
-    }
-
+      message: '保存成功'
+    };
+    return;
   }
 
-  //    const article = await getArticle();
-  //    console.log('article,', article);
-  //    ctx.body = 'article';
+  if (ctx.request.path === '/api/article/update') {
+    const obj = await parsePostData(ctx);
+    const {
+      _id,
+      title,
+      content
+    } = JSON.parse(obj);
+    Article.findById(_id, (err, article) => {
+      if (err) return err;
+      article.set({
+        title,
+        content
+      });
+      article.save();
+      console.log('82');
+    });
+    console.log('84');
+    ctx.body = {
+      code: 200,
+      message: '更新成功'
+    };
+  }
+
+  if (ctx.request.path === '/api/article/delete') {
+    const obj = await parsePostData(ctx);
+    const {
+      _id,
+} = JSON.parse(obj);
+console.log('97', _id);
+    const res = Article.find({_id}).remove().exec();
+    console.log('84', res.deletedCount);
+    ctx.body = {
+      code: 200,
+      message: '删除成功'
+    };
+  }
+
+  console.log('68', ctx.body);
 });
+
 // 解析上下文里node原生请求的POST参数
 function parsePostData(ctx) {
   return new Promise((resolve, reject) => {
     try {
-      let postdata = "";
+      let postdata = '';
       ctx.req.addListener('data', (data) => {
         postdata += data
       })
-      ctx.req.addListener("end", function() {
+      ctx.req.addListener('end', function() {
         //let parseData = parseQueryStr(postdata)
         resolve(postdata);
       })
