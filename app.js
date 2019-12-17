@@ -55,7 +55,6 @@ app.use(async ctx => {
       title,
       content
     });
-    console.log('58')
     let repErr = null;
     await article.save();
     ctx.body = {
