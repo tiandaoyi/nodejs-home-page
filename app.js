@@ -25,9 +25,9 @@ const articleSchema = new Schema({
 });
 
 // 启动服务
-// 监听3001端口
-app.listen(3001, () => {
-  console.log('[Koa] Server is starting at port 3001!');
+// 监听7200端口
+app.listen(7200, () => {
+  console.log('[Koa] Server is starting at port 7200!');
 });
 
 app.use(async ctx => {
