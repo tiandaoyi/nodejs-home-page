@@ -1,7 +1,7 @@
 const Koa = require('koa');
 const app = new Koa();
 
-const router = require('koa-router');
+// const router = require('koa-router');
 const mongoose = require('./database/index.js');
 // 定义SCHEMA 每个schema都会映射一个collection
 const Schema = mongoose.Schema;
@@ -32,15 +32,37 @@ app.listen(7200, () => {
 
 app.use(async ctx => {
   // 文章model
-  const Article = mongoose.model('article', articleSchema);
+  // 获取全部不再暴露
+  // const Article = mongoose.model('article', articleSchema);
+  // if (ctx.request.path === '/api/article/all') {
+  //   const data = await Article.find((err, article) => {
+  //     return article;
+  //   });
+  //   ctx.body = {
+  //     code: 200,
+  //     data,
+  //     message: null
+  //   }
+  //   return;
+  // };
+
   if (ctx.request.path === '/api/article/all') {
+    const Article = mongoose.model('article', articleSchema);
+    const {
+      pageSize = 20,
+      pageNo = 1
+    } = JSON.parse(await parsePostData(ctx));
+    const allData = await Article.count()
     const data = await Article.find((err, article) => {
       return article;
-    });
+    }).skip((pageNo - 1) * pageSize).limit(pageSize).sort('-created')
     ctx.body = {
       code: 200,
-      data,
-      message: null
+      data: {
+        list: data || [],
+        total: allData || 0
+      },
+      message: 'success'
     }
     return;
   };
@@ -51,11 +73,13 @@ app.use(async ctx => {
       title,
       content
     } = JSON.parse(obj);
+    // 这里添加保存的其他属性
     const article = new Article({
       title,
       content
     });
     let repErr = null;
+    console.log('save:' + title)
     await article.save();
     ctx.body = {
       code: 200,
