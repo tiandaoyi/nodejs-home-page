@@ -45,9 +45,9 @@ app.use(async ctx => {
   //   }
   //   return;
   // };
+  const Article = mongoose.model('article', articleSchema);
 
   if (ctx.request.path === '/api/article/all') {
-    const Article = mongoose.model('article', articleSchema);
     const {
       pageSize = 20,
       pageNo = 1
@@ -125,7 +125,18 @@ console.log('97', _id);
     };
   }
 
-  console.log('68', ctx.body);
+  if (ctx.request.path === '/api/article/getDetail') {
+    const { _id
+    } = JSON.parse(await parsePostData(ctx));
+    const data = await Article.findOne({ _id })
+    ctx.body = {
+      code: 200,
+      data,
+      message: 'success'
+    }
+    return;
+  }
+
 });
 
 // 解析上下文里node原生请求的POST参数
