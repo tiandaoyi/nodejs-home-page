@@ -2,7 +2,7 @@ const Koa = require('koa');
 const app = new Koa();
 
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/home";
+const url = "mongodb://localhost:27027/home";
 
 MongoClient.connect(url, {useNewUrlParser: true}, (err,db) => 
 {
@@ -30,6 +30,6 @@ console.log('创建集合');
 
 db.close();
 })
-});
+// });
 
 

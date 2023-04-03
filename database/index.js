@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // docker的URI
 const uri = process.env.MONGO_URI;
 // 数据库地址
-const DB_ADDRESS = uri || 'mongodb://localhost:27017/home';
+const DB_ADDRESS = uri || 'mongodb://localhost:27027/home';
 
 // 连接数据库
 mongoose.connect(DB_ADDRESS, {

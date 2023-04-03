@@ -8,11 +8,11 @@ const Schema = mongoose.Schema;
 
 const articleSchema = new Schema({
   title: String,
-  author: String,
   content: String,
-  hidden: Boolean,
+  show: Boolean,
   tag: Array,
-  hot: Number,
+  // categories: Array,
+  categories: [{ type: Schema.Types.ObjectId, ref: 'Categories' }],
   meta: {
     votes: Number,
     favs: Number
@@ -24,6 +24,23 @@ const articleSchema = new Schema({
   }
 });
 
+const categoriesSchema = new Schema({
+  name: String,
+  meta: {
+    votes: Number,
+    favs: Number
+  }
+}, {
+  timestamps: {
+    createdAt: 'created',
+    updatedAt: 'updated'
+  }
+});
+
+const Article = mongoose.model('Article', articleSchema);
+const Categories = mongoose.model('Categories', categoriesSchema);
+
+
 // 启动服务
 // 监听7200端口
 app.listen(7200, () => {
@@ -31,31 +48,20 @@ app.listen(7200, () => {
 });
 
 app.use(async ctx => {
-  // 文章model
-  // 获取全部不再暴露
-  // const Article = mongoose.model('article', articleSchema);
-  // if (ctx.request.path === '/api/article/all') {
-  //   const data = await Article.find((err, article) => {
-  //     return article;
-  //   });
-  //   ctx.body = {
-  //     code: 200,
-  //     data,
-  //     message: null
-  //   }
-  //   return;
-  // };
-  const Article = mongoose.model('article', articleSchema);
 
   if (ctx.request.path === '/api/article/all') {
     const {
       pageSize = 20,
-      pageNo = 1
+      pageNo = 1,
+      isShowInvalid = false, // 是否显示失效数据
     } = JSON.parse(await parsePostData(ctx));
     const allData = await Article.count()
-    const data = await Article.find((err, article) => {
-      return article;
-    }).skip((pageNo - 1) * pageSize).limit(pageSize).sort('-created')
+    const data = await Article.find({}).
+      where('show').in(isShowInvalid ? [true, false] : [true]).
+      skip((pageNo - 1) * pageSize).
+      limit(pageSize).
+      populate('categories').
+      sort('-created')
     ctx.body = {
       code: 200,
       data: {
@@ -129,6 +135,7 @@ console.log('97', _id);
     const { _id
     } = JSON.parse(await parsePostData(ctx));
     const data = await Article.findOne({ _id })
+      .populate('categories')
     ctx.body = {
       code: 200,
       data,
@@ -136,6 +143,29 @@ console.log('97', _id);
     }
     return;
   }
+
+
+
+  if (ctx.request.path === '/api/category/all') {
+    const {
+      pageSize = 20,
+      pageNo = 1
+    } = JSON.parse(await parsePostData(ctx));
+    const allData = await Categories.count()
+    const data = await Categories.find((err, item) => {
+      return item;
+    }).skip((pageNo - 1) * pageSize).limit(pageSize).sort('-created')
+    ctx.body = {
+      code: 200,
+      data: {
+        list: data || [],
+        total: allData || 0
+      },
+      message: 'success'
+    }
+    return;
+  };
+
 
 });
 
