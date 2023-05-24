@@ -82,7 +82,8 @@ app.use(async ctx => {
     // 这里添加保存的其他属性
     const article = new Article({
       title,
-      content
+      content,
+      show: true
     });
     let repErr = null;
     console.log('save:' + title)
