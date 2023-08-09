@@ -30,4 +30,5 @@ target/
 *.tmp
 
 # system ignore
-.DS_Strore
+.DS_Store
+._*
