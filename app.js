@@ -39,7 +39,6 @@ const categoriesSchema = new Schema({
 const Article = mongoose.model('Article', articleSchema);
 const Categories = mongoose.model('Categories', categoriesSchema);
 
-
 // 启动服务
 // 监听7200端口
 app.listen(7200, () => {
