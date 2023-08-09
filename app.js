@@ -1,7 +1,6 @@
 const Koa = require('koa');
 const app = new Koa();
 
-// const router = require('koa-router');
 const mongoose = require('./database/index.js');
 // 定义SCHEMA 每个schema都会映射一个collection
 const Schema = mongoose.Schema;
